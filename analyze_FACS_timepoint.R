@@ -2,7 +2,7 @@
 # Rscript to analyze FACS data collected during competetion experiments
 # Robin Green
 # Shou Lab, Basic Sciences, Fred Hutchinson Cancer Research Center
-# Version 1.0 
+# Version 1.1 
 # 2014-11-11
 
 ###################
