@@ -366,11 +366,18 @@ all<-c()
 #all<-rbind(b,c)
 all<-b
 
+#all<-all[-(which(all$Sample=='L'),]
+#all<-all[-(which(all$Sample=='L'),]
 
+
+
+nums<-c(.7,.8,.85,.9,.925,.95,.975,.99,1,1.01,1.02,1.03,1.05)
+nums<-log(nums)
+labs<-c('.7','.8','.85','.9','.925','.95','.975','.99','1','1.01','1.02','1.03','1.05')
 
 png(file='2014-11-6_AllRatioVsGen.png')
-a<-ggplot(data=all,aes(x=all$Gen,y=log(all$ratio),col=((all$strains))))+mytheme+xlab("time in Gen")+ylab('Ratio to Ruler Strain')+
-  geom_point(data=c,aes(x=c$Gen,y=log(c$ratio),col=c$strains))+geom_line(data=c,aes(x=c$Gen,y=log(c$ratio),col=c$strains))+ylim(-0.5,.5)
+a<-ggplot(data=all,aes(x=all$Gen,y=log(all$ratio),col=((all$strains))))+mytheme+xlab("time in Gen")+ylab('ln Ratio to Ruler Strain')+
+    geom_point(data=c,aes(x=c$Gen,y=log(c$ratio),col=c$strains))+geom_line(data=c,aes(x=c$Gen,y=log(c$ratio),col=c$strains))+scale_y_continuous(limits=c(log(0.7),log(1.1)),breaks=log(c(.7,.8,.85,.9,.925,.95,.975,.99,1,1.01,1.02,1.03,1.05)),labels=labs)#+ylim(log(0.7),log(1.1))
 print(a)
 
 dev.off()
