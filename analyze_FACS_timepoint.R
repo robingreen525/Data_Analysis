@@ -11,8 +11,7 @@ dir<-'X:/fast/shou_w/shougroup/lab_users/Robin/Notebook/CoSMO Auxotrophs/Competi
 save_file<-'Hour10.RData'
 output_csv<-'Hour10_Processed.csv'
 
-
-
+options( scipen = -200000 )
 ###########################################
 #install nessecary packages
 
@@ -46,7 +45,7 @@ colnames(r)<-c('Sample','Total','BeadCount','CellDustCount','CellCount','LiveCel
 r<-r[-nrow(r),]
 r<-r[-nrow(r),] # removes mean and SD row entries
 
-# get cell name 
+# get cell name (A01,B01...)
 names<-c()
 for(i in 1:nrow(r))
 {
@@ -129,7 +128,9 @@ mytheme =   list(
 )		
 
 
-Hour<-rep(6,nrow(r))
+
+#create data object that will be used to stich together with other timepoints and save work
+Hour<-rep(10,nrow(r))
 Hour10<-cbind(r,Hour)
 save.image(save_file)
 
