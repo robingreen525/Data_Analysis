@@ -1,25 +1,39 @@
-###load data files and move to working directory
+###########################
+#load data files and move to working directory
+{
 install.packages('ggplots')
 require(ggplot2)
 dir<-'~/Desktop/comp_data/'
 setwd(dir)
+}
+###########################
+#load RData file where each time point R object is stored (may need to load more than one)
 #load('2014-11-12.RData')
 
+
+###########################
+#for each time point RData object, calculate average color/mL, Std Dev, CV, and ratios of colors as desired
 {
-Hour0<-Hour0_proc
+  
+  
+Hour0<-Hour0_proc ## special case (removed P,Q samples)
 i<-1
 Hour0_avg<-c()
+
+#iterate by 3 (since FACS triplicates per sample)
 while(i<nrow(Hour0))
 {
   row1<-Hour0[i,]
   row2<-Hour0[i+1,]
   row3<-Hour0[i+2,]
   
+  
+  #aggregate 3 rows and remove unwanted information
   drop<-c('Sample','rows','cols')
   all<-rbind(row1,row2,row3)
   all<-all[,!names(all) %in% drop]
 
-  
+  #cacluate desired data from aggregate and create new row/object
   mCherryPermL<-mean(all$mCherryPermL)
   mCherryPermL_StdDev<-sd(all$mCherryPermL)
   mCherryPermL_CV<-mCherryPermL_StdDev/mCherryPermL
@@ -32,16 +46,20 @@ while(i<nrow(Hour0))
   
   Hour0_avg<-rbind(Hour0_avg,c(mCherryPermL,mCherryPermL_StdDev,mCherryPermL_CV*100,BFPPermL,BFPPermL_StdDev,BFPPermL_CV*100,mOrangePermL,mOrangePermL_StdDev,mOrangePermL_CV*100))
 
-  
+  # got to i+3 position
   i<-i+3
   
   
 }
 
+#rename colums as needed
 colnames(Hour0_avg)<-c('mCherryPermL_AVG','mCherryPermL_SD','mCherryPermL_CV','BFPPermL_AVG','BFPPermL_SD','BFPPermL_CV','mOrangePermL_AVG','mOrangePermL_SD','mOrangePermL_CV')
 rownames(Hour0_avg)<-c('A','B','C','D','E','F','G','H','I','J','L','M','N','O')
+#incorporate hour/time at which data were gathered
 Hour<-rep(0,nrow(Hour0_avg))
 Hour0_avg<-cbind(Hour,Hour0_avg)
+
+#repeat for each time point/R objected
 
 i<-1
 Hour2_avg<-c()
@@ -183,33 +201,50 @@ rownames(Hour10_avg)<-c('A','B','C','D','E','F','G','H','I','J','L','M','N','O')
 Hour<-rep(10,nrow(Hour10_avg))
 Hour10_avg<-cbind(Hour,Hour10_avg)
 
-All_Data<-rbind(Hour0_avg,Hour2_avg,Hour4_avg,Hour6_avg,Hour8_avg,Hour10_avg)
-All_Data<-as.data.frame(All_Data)
-mCherryPerBFP<-(All_Data$mCherryPermL_AVG/All_Data$BFPPermL_AVG)
-All_Data<-cbind(All_Data,mCherryPerBFP)
-mOrangePerBFP<-(All_Data$mOrangePermL_AVG/All_Data$BFPPermL_AVG)
-All_Data<-cbind(All_Data,mOrangePerBFP)
+
+}
+
+#############################
+#aggregate all data into master object to be used for plotting/analysis
+{
+ All_Data<-rbind(Hour0_avg,Hour2_avg,Hour4_avg,Hour6_avg,Hour8_avg,Hour10_avg)
+ All_Data<-as.data.frame(All_Data)
+ mCherryPerBFP<-(All_Data$mCherryPermL_AVG/All_Data$BFPPermL_AVG)
+ All_Data<-cbind(All_Data,mCherryPerBFP)
+ mOrangePerBFP<-(All_Data$mOrangePermL_AVG/All_Data$BFPPermL_AVG)
+ All_Data<-cbind(All_Data,mOrangePerBFP)
+}
+
+#############################
+# theme for ggplot to standardize color scheme and how to plot data
+{
+  mytheme =   list(
+  geom_line(),
+  geom_point(shape=1,size=3.5),
+  #xlab("time in hours"),
+  #ylab("Met-/Met+"),
+  scale_colour_manual(values = c("red",'red',"blue",'blue', "green",'green',"orange",'orange',"black",'black', "purple",'purple','darkgreen','darkgreen'))
+)	
+}
+
+##############################
+#collect dilutions(cumulative over experiment) and generation for each timepoint per sample (based on OD)
+{
+f<-read.csv('Dilutions_Gen.csv',header=T)
+All_Data<-cbind(All_Data,f)
 }
 
 
-mytheme =   list(
-  geom_line(),
-  geom_point(shape=1,size=3.5),
-  xlab("time in hours"),
-  ylab("Met-/Met+"),
-  scale_colour_manual(values = c("red",'red',"blue",'blue', "green",'green',"orange",'orange',"black",'black', "purple",'purple','darkgreen','darkgreen'))
-)	
-
-f<-read.csv('Dilutions_Gen.csv',header=T)
-All_Data<-cbind(All_Data,f)
-
+#############################
+# match samples (A,B,C) with the competing strain (all share same ruler strain)
+{
 strains<-rep(c('WY1773.1','WY1773.2','WY1774.1','WY1774.2','WY1775.1','WY1775.2','WY1922.1','WY1922.2','WY1924.1','WY1924.2','WY1344.1','WY1344.2','WY1348.1','WY1348.2'),6)
-
 All_Data<-cbind(All_Data,strains)
+}
 
-
-
-
+#############################
+# plot population density vs time and ratios vs generation (mCherry vs BFP OR mOrange vs BFP)
+{
 png(file='2014-11-6_MetAuxoRatiovsGen.png')
 a<-ggplot(data=All_Data,aes(x=All_Data$Gen,y=log((All_Data$mCherryPerBFP)),col=((All_Data$strains))))+mytheme+xlab("time in Gen")+ylim(-0.5,0.5)+ylab('ln Met-/Met+')
 print(a)
@@ -231,7 +266,7 @@ png(file='2014-11-6_BFPVsGen.png')
 a<-ggplot(data=All_Data,aes(x=All_Data$Gen,y=log(All_Data$BFPPermL_AVG*(All_Data$Cumulative.Dil)),col=((All_Data$strains))))+mytheme+xlab("time in Gen")+ylab('ln BFP Density')
 print(a)
 dev.off()
-
+}
 nams<-c('A','B','C','D','E','F','I','J')
 
 
@@ -354,10 +389,10 @@ dev.off()
 drop=c('L','M','N','O')
 
 b<-All_Data[,c('Gen','Sample','strains','mCherryPerBFP')]
-b<-b[which(!(b$Sample==drop)),]
+b<-b[which(!(b$Sample %in% drop)),]
 
 c<-All_Data[,c('Gen','Sample','strains','mOrangePerBFP')]
-c<-c[which((c$Sample==drop)),]
+c<-c[which((c$Sample %in% drop)),]
 
 colnames(b)<-c('Gen','Sample','strains','ratio')
 colnames(c)<-c('Gen','Sample','strains','ratio')
