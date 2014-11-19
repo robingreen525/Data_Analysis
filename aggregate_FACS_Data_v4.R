@@ -20,6 +20,15 @@ Hour0<-Hour0_proc ## special case (removed P,Q samples)
 i<-1
 Hour0_avg<-c()
 
+
+a<-Hour0_proc[c(16,17,18),]
+b<-Hour0_proc[c(19,20,21),]
+
+Hour0_proc[c(16,17,18),]<-b
+Hour0_proc[c(19,20,21),]<-a
+
+Hour0<-Hour0_proc
+
 #iterate by 3 (since FACS triplicates per sample)
 while(i<nrow(Hour0))
 {
@@ -267,7 +276,7 @@ a<-ggplot(data=All_Data,aes(x=All_Data$Gen,y=log(All_Data$BFPPermL_AVG*(All_Data
 print(a)
 dev.off()
 }
-nams<-c('A','B','C','D','E','F','I','J')
+nams<-c('A','B','C','D','E','F','G','H','I','J')
 
 
 png(file='2014-11-6_mCherryVsGen_Wrapped.png')
@@ -291,8 +300,8 @@ for(i in 1:length(nams))
   nam<-nams[i]
   print(nam)
   a<-All_Data[which(All_Data$Sample==nam),]
-  a<-a[-1,]
-  for(j in 1:(nrow(a)))
+  #a<-a[-1,]
+  for(j in 1:(nrow(a)-1))
   {
     print(j)
     print(a$Gen[j])
@@ -312,17 +321,23 @@ fit_advs<-as.data.frame(fit_advs)
 fit_advs$Gen<-floor(as.numeric(as.character(fit_advs$Gen)))
 fit_advs$Fit_Adv<-as.numeric(as.character(fit_advs$Fit_Adv))
 
-Gen<-rep(c(2,3,4,5,NA),length(nams))
+Gen<-rep(c(1,2,3,5,6),length(nams))
 #Sample<-rep(c('WY1773','WY1773','WY1774','WY1774','WY1775','WY1775','WY1924','WY1924'),5)
 
 fit_advs$Gen<-Gen
-
-strains<-c('WY1773','WY1773','WY1773','WY1773','WY1773','WY1773','WY1773','WY1773','WY1774','WY1774','WY1774','WY1774','WY1774','WY1774','WY1774','WY1774',
-           'WY1775','WY1775','WY1775','WY1775','WY1775','WY1775','WY1775','WY1775','WY1922','WY1922','WY1922','WY1922','WY1922','WY1922','WY1922','WY1922',
-           'WY1924','WY1924','WY1924','WY1924','WY1924','WY1924','WY1924','WY1924')
-
+print('merp')
+strains<-c('WY1773','WY1773','WY1773','WY1773','WY1773','WY1773','WY1773','WY1773','WY1773','WY1773',
+           'WY1774','WY1774','WY1774','WY1774','WY1774','WY1774','WY1774','WY1774','WY1774','WY1774',
+           'WY1775','WY1775','WY1775','WY1775','WY1775','WY1775','WY1775','WY1775','WY1775','WY1775',
+           'WY1922','WY1922','WY1922','WY1922','WY1922','WY1922','WY1922','WY1922','WY1922','WY1922',
+           'WY1924','WY1924','WY1924','WY1924','WY1924','WY1924','WY1924','WY1924','WY1924','WY1924')
+           
+           
+           
+           
+           
 fit_advs<-cbind(fit_advs,strains)
-
+print('derp')
 png('FitnessVSGenEach.png')
 a<-ggplot(data=fit_advs,aes(x=Gen,y=Fit_Adv,col=strains))+geom_point(size=(2))+geom_line(aes(y=0))+facet_wrap(~strains)+ylab('%Fitness Advantage Relative to BFP Ruler')
 print(a)
@@ -340,8 +355,8 @@ for(i in 1:length(nams))
   nam<-nams[i]
   print(nam)
   a<-All_Data[which(All_Data$Sample==nam),]
-  a<-a[-1,]
-  for(j in 1:(nrow(a)))
+  #a<-a[-1,]
+  for(j in 1:(nrow(a)-1))
   {
     print(j)
     print(a$Gen[j])
@@ -361,7 +376,7 @@ fit_advs<-as.data.frame(fit_advs)
 fit_advs$Gen<-floor(as.numeric(as.character(fit_advs$Gen)))
 fit_advs$Fit_Adv<-as.numeric(as.character(fit_advs$Fit_Adv))
 
-Gen<-rep(c(2,3,4,5,NA),length(nams))
+Gen<-rep(c(1,2,3,5,6),length(nams))
 
 fit_advs$Gen<-Gen
 
@@ -378,7 +393,7 @@ print(a)
 fit_advs_all<-rbind(fit_advs_comp,fit_advs)
 
 png('FitnessVSGen_ALL.png')
-a<-ggplot(data=fit_advs_all,aes(x=Gen,y=Fit_Adv,col=strains))+geom_point(size=(2))+geom_line(aes(y=0))+facet_wrap(~strains)+ylab('%Fitness Advantage Relative to Ruler Strain')
+a<-ggplot(data=fit_advs_all,aes(x=Gen,y=Fit_Adv,col=strains))+geom_point(size=(2))+geom_line(aes(y=0,col='00000'))+facet_wrap(~strains)+ylab('%Fitness Advantage Relative to Ruler Strain')+ylim(-20,20)
 print(a)
 
 
@@ -412,9 +427,19 @@ labs<-c('.7','.8','.85','.9','.925','.95','.975','.99','1','1.01','1.02','1.03',
 
 png(file='2014-11-6_AllRatioVsGen.png')
 a<-ggplot(data=all,aes(x=all$Gen,y=log(all$ratio),col=((all$strains))))+mytheme+xlab("time in Gen")+ylab('ln Ratio to Ruler Strain')+
-    geom_point(data=c,aes(x=c$Gen,y=log(c$ratio),col=c$strains))+geom_line(data=c,aes(x=c$Gen,y=log(c$ratio),col=c$strains))+scale_y_continuous(limits=c(log(0.7),log(1.1)),breaks=log(c(.7,.8,.85,.9,.925,.95,.975,.99,1,1.01,1.02,1.03,1.05)),labels=labs)#+ylim(log(0.7),log(1.1))
+    geom_point(data=c,aes(x=c$Gen,y=log(c$ratio),col=c$strains))+geom_line(data=c,aes(x=c$Gen,y=log(c$ratio),col=c$strains))+scale_y_continuous(limits=c(log(0.6),log(1.1)),breaks=log(c(.6,.8,.85,.9,.925,.95,.975,.99,1,1.01,1.02,1.03,1.05)),labels=labs)#+ylim(log(0.7),log(1.1))
 print(a)
 
 dev.off()
+
+
+labs<-c('.6','.8','1','1.05')
+png(file='2014-11-6_AllRatioVsGen_Wrapped.png')
+a<-ggplot(data=all,aes(x=Gen,y=log(ratio),col=((strains))))+mytheme+xlab("time in Gen")+ylab('ln Ratio to Ruler Strain')+
+  geom_point(data=c,aes(x=Gen,y=log(ratio),col=strains))+geom_line(data=c,aes(x=Gen,y=log(ratio),col=strains))+scale_y_continuous(limits=c(log(0.6),log(1.1)),breaks=log(c(.6,.8,1,1.05)),labels=labs)+facet_wrap(~strains)#+ylim(log(0.7),log(1.1))
+print(a)
+
+dev.off()
+
 
 save.image('2014-11-16.RData')
