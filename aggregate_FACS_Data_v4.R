@@ -1,21 +1,21 @@
 ###########################
 #load data files and move to working directory
 {
-install.packages('ggplots')
+#install.packages('ggplots')
 require(ggplot2)
 dir<-'~/Desktop/comp_data/'
 setwd(dir)
 }
 ###########################
 #load RData file where each time point R object is stored (may need to load more than one)
-#load('2014-11-12.RData')
+#load('2014-11-19.RData')
 
 
 ###########################
 #for each time point RData object, calculate average color/mL, Std Dev, CV, and ratios of colors as desired
 {
   
-  
+Hour0_proc<-Hour0[1:42,]  
 Hour0<-Hour0_proc ## special case (removed P,Q samples)
 i<-1
 Hour0_avg<-c()
@@ -393,12 +393,18 @@ print(a)
 fit_advs_all<-rbind(fit_advs_comp,fit_advs)
 
 png('FitnessVSGen_ALL.png')
-a<-ggplot(data=fit_advs_all,aes(x=Gen,y=Fit_Adv,col=strains))+geom_point(size=(2))+geom_line(aes(y=0,col='00000'))+facet_wrap(~strains)+ylab('%Fitness Advantage Relative to Ruler Strain')+ylim(-20,20)
+a<-ggplot(data=fit_advs_all,aes(x=Gen,y=Fit_Adv,col=strains))+geom_point(size=(2))+geom_line(aes(y=0,col='black'))+facet_wrap(~strains)+ylab('%Fitness Advantage Relative to Ruler Strain')+ylim(-20,20)
 print(a)
 
 
 dev.off()
 
+png('FitnessVSGen_ALL_LargerScale.png')
+a<-ggplot(data=fit_advs_all,aes(x=Gen,y=Fit_Adv,col=strains))+geom_point(size=(2))+geom_line(aes(y=0,col='black'))+facet_wrap(~strains)+ylab('%Fitness Advantage Relative to Ruler Strain')+ylim(-30,30)
+print(a)
+
+
+dev.off()
 
 
 drop=c('L','M','N','O')
@@ -422,24 +428,36 @@ all<-b
 
 
 nums<-c(.7,.8,.85,.9,.925,.95,.975,.99,1,1.01,1.02,1.03,1.05)
+nums_copy<-nums
 nums<-log(nums)
 labs<-c('.7','.8','.85','.9','.925','.95','.975','.99','1','1.01','1.02','1.03','1.05')
 
 png(file='2014-11-6_AllRatioVsGen.png')
 a<-ggplot(data=all,aes(x=all$Gen,y=log(all$ratio),col=((all$strains))))+mytheme+xlab("time in Gen")+ylab('ln Ratio to Ruler Strain')+
-    geom_point(data=c,aes(x=c$Gen,y=log(c$ratio),col=c$strains))+geom_line(data=c,aes(x=c$Gen,y=log(c$ratio),col=c$strains))+scale_y_continuous(limits=c(log(0.6),log(1.1)),breaks=log(c(.6,.8,.85,.9,.925,.95,.975,.99,1,1.01,1.02,1.03,1.05)),labels=labs)#+ylim(log(0.7),log(1.1))
+    geom_point(data=c,aes(x=c$Gen,y=log(c$ratio),col=c$strains))+geom_line(data=c,aes(x=c$Gen,y=log(c$ratio),col=c$strains))+scale_y_continuous(limits=c(log(0.6),log(1.1)),breaks=log(c(.6,.8,.85,.9,.925,.95,.975,.99,1,1.01,1.02,1.03,1.05)),labels=as.character(nums_copy))#+ylim(log(0.7),log(1.1))
 print(a)
 
 dev.off()
 
 
-labs<-c('.6','.8','1','1.05')
+labs<-c('.5','.6','.8','1','1.2')
 png(file='2014-11-6_AllRatioVsGen_Wrapped.png')
 a<-ggplot(data=all,aes(x=Gen,y=log(ratio),col=((strains))))+mytheme+xlab("time in Gen")+ylab('ln Ratio to Ruler Strain')+
-  geom_point(data=c,aes(x=Gen,y=log(ratio),col=strains))+geom_line(data=c,aes(x=Gen,y=log(ratio),col=strains))+scale_y_continuous(limits=c(log(0.6),log(1.1)),breaks=log(c(.6,.8,1,1.05)),labels=labs)+facet_wrap(~strains)#+ylim(log(0.7),log(1.1))
+  geom_point(data=c,aes(x=Gen,y=log(ratio),col=strains))+geom_line(data=c,aes(x=Gen,y=log(ratio),col=strains))+scale_y_continuous(limits=c(log(0.5),log(1.5)),breaks=log(c(0.5,.6,.8,1,1.2)),labels=labs)+facet_wrap(~strains)#+ylim(log(0.7),log(1.1))
 print(a)
 
 dev.off()
+
+labs<-c('.5','.6','.8','1','1.2','1.3','1.4')
+
+png(file='2014-11-6_AllRatioVsGen_LargerScale.png')
+a<-ggplot(data=all,aes(x=all$Gen,y=log(all$ratio),col=((all$strains))))+mytheme+xlab("time in Gen")+ylab('ln Ratio to Ruler Strain')+
+  geom_point(data=c,aes(x=c$Gen,y=log(c$ratio),col=c$strains))+geom_line(data=c,aes(x=c$Gen,y=log(c$ratio),col=c$strains))+scale_y_continuous(limits=c(log(0.5),log(1.4)),breaks=log(c(.5,.6,.8,1,1.2,1.3,1.4)),labels=labs)#+ylim(log(0.7),log(1.1))
+print(a)
+
+dev.off()
+
+
 
 
 save.image('2014-11-16.RData')

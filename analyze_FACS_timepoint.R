@@ -7,7 +7,7 @@
 
 ###################
 #set save file parameters and working directory
-dir<-'X:/fast/shou_w/shougroup/lab_users/Robin/Notebook/CoSMO Auxotrophs/Competition/Supplemented Media/2014-10-6_AncestralMetMinusSuppMedia/'
+dir<-'/Volumes/fast/shou_w/shougroup/lab_users/Robin/Notebook/CoSMO Auxotrophs/Competition/Supplemented Media/2014-10-6_AncestralMetMinusSuppMedia/'
 save_file<-'Hour10.RData'
 output_csv<-'Hour10_Processed.csv'
 
@@ -93,7 +93,7 @@ CelluL<-120
 #read table of dilutions to get dilution factor for each sample
 dd<-loadWorkbook(filename='Hour10/Hour10_Dilutions.xlsx')
 d<-readWorksheet(dd,sheet='Sheet1',header=T)
-dilution_factor<-d$uL.Cells/d$uL.Total
+dilution_factor<-d$uL.Total/d$uL.Cells
 
 r<-cbind(r,dilution_factor)
 
