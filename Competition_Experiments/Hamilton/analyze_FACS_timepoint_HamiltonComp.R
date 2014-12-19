@@ -8,8 +8,8 @@
 ###################'
 #set save file parameters and working directory
 dir<-'X:/fast/shou_w/shougroup/lab_users/Robin/Notebook/Hamilton Competetion/2014-12-11_CoSMOCheatCoopBenchmarkTest/'
-save_file<-'Hour17.RData'
-output_csv<-'Hour17_Processed.csv'
+save_file<-'Hour25.RData'
+output_csv<-'Hour25_Processed.csv'
 
 options( scipen = -200000 )
 ###########################################
@@ -28,9 +28,9 @@ setwd(dir)
 ####################################
 # read input excel file from FloJo Analysis of timepoint
 
-#rr<-loadWorkbook(filename='Hour17/Hour17_results.xls')
+#rr<-loadWorkbook(filename='Hour25/Hour25_results.xls')
 #r<-readWorksheet(rr,sheet='Sheet0',header=T)
-r<-read.csv('Hour17/Results.csv',header=T)
+r<-read.csv('Hour25/Results.csv',header=T)
 
 #######################################
 #Set up reference 'dictionary' to match well positions with strain pairs
@@ -127,9 +127,10 @@ mytheme =   list(
 
 
 #create data object that will be used to stich together with other timepoints and save work
-Hour<-rep(17,nrow(r))
-Hour17<-cbind(r,Hour)
+Hour<-rep(25,nrow(r))
+Hour25<-cbind(r,Hour)
 save.image(save_file)
+save.image('2014-12-18.RData')
 
 
 
